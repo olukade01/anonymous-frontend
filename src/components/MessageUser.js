@@ -6,6 +6,9 @@ const H1 = styled.h1`
   color: white;
   font-size: 2.5rem;
   text-align: center;
+  @media screen and (max-width: 425px) {
+    font-size: 2rem;
+  }
 `;
 const Button = styled.button`
   margin-top: 2rem;
@@ -44,7 +47,7 @@ const MessagUser = ({ user, createMessage, messages }) => {
     createMessage({ message: message.value });
     setTimeout(() => {
       navigate("/register");
-    }, 5000);
+    }, 3000);
   };
 
   return (

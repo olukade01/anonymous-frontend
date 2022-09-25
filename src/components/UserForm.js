@@ -1,4 +1,3 @@
-// import { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import useField from "../hooks/FieldHooks";
@@ -7,12 +6,15 @@ const H1 = styled.h1`
   color: white;
   text-align: center;
   font-size: 3rem;
+
+  @media screen and (max-width: 425px) {
+    font-size: 2.5rem;
+  }
 `;
 
 const P = styled.p`
   color: #b0b7c0;
   text-align: center;
-  /* margin-bottom: 3rem; */
 `;
 
 const Message = styled.p`
@@ -50,13 +52,13 @@ const Button = styled.button`
 `;
 
 const UserForm = ({ addUser, message }) => {
-  const email = useField("text", "Enter your email");
-  const name = useField("text", "Enter name");
+  const email = useField("email", "Enter your email");
+  const name = useField("text", "Enter Username");
   const password = useField("password", "Enter password");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addUser({ email: email.value, name: name.value, password: password.value });
+    addUser({ name: name.value, email: email.value, password: password.value });
     // email.reset()
     // name.reset()
     // password.reset()
@@ -72,7 +74,7 @@ const UserForm = ({ addUser, message }) => {
           <Input {...email} />
         </div>
         <div>
-          <Label>Name</Label>
+          <Label>Usernaame</Label>
           <Input {...name} />
         </div>
         <div>
@@ -82,7 +84,11 @@ const UserForm = ({ addUser, message }) => {
         <Button type="submit">Register Account</Button>
       </form>
       <P>
-        Already Have an Account? <Link to="/">Login</Link> Here
+        Already Have an Account?{" "}
+        <Link style={{ color: "green", textDecoration: "none" }} to="/">
+          Login
+        </Link>{" "}
+        here
       </P>
       <P>
         By using this service, you agree to our Privacy Policy, Terms of Service

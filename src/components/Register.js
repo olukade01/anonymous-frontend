@@ -27,6 +27,12 @@ const H1 = styled.h1`
   border-bottom: 2px solid purple;
   padding-bottom: 0.8rem;
 `;
+const Ul = styled.ul`
+  font-weight: 700;
+  @media screen and (max-width: 425px) {
+    margin-left: -1.5rem;
+  }
+`;
 
 const Register = () => {
   const navigate = useNavigate();
@@ -34,13 +40,13 @@ const Register = () => {
     <div>
       <Card>
         <H1>How to Play?</H1>
-        <ul style={{ fontWeight: 900, color: "darkgreen" }}>
+        <Ul>
           <li>Register your Account NOW!!</li>
           <li>share your Dare Link with others</li>
           <li>
             Receive anonymous compliments and secret messages from your friends
           </li>
-        </ul>
+        </Ul>
       </Card>
       <P>
         Now it's your turn to create an account and dare your friends to tell

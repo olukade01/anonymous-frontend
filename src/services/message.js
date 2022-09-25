@@ -7,16 +7,16 @@ const setToken = (newToken) => {
   token = `bearer ${newToken}`;
 };
 
-const getAll = () => {
+const getAll = async () => {
   const config = {
     headers: { Authorization: token },
   };
-  const response = axios.get(baseUrl, config);
+  const response = await axios.get(baseUrl, config);
   return response.data;
 };
 
-const create = async (email, message) => {
-  const response = await axios.post(`${baseUrl}/${email}`, message);
+const create = async (name, message) => {
+  const response = await axios.post(`${baseUrl}/${name}`, message);
   return response.data;
 };
 

@@ -10,18 +10,25 @@ import messageServices from "./services/message";
 import styled from "styled-components";
 import Register from "./components/Register";
 
+const Wrapper = styled.div`
+  background: linear-gradient(45deg, #00dbde, #fc00ff);
+  min-height: 100vh;
+  padding: 3rem 1rem;
+`;
 const Container = styled.div`
   background-color: #251433;
+  margin: auto;
   max-width: 35rem;
-  margin: 2rem auto;
-  padding: 3rem;
-  border-radius: 10px;
+  padding: 2rem;
+  border-radius: 15px;
 `;
 
 const App = () => {
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+
   useEffect(() => {
     async function fetchData() {
       const data = await userServices.getAll();
@@ -59,7 +66,6 @@ const App = () => {
     try {
       const user = await loginServices(loginDetails);
       window.localStorage.setItem("loggedInUser", JSON.stringify(user));
-      // console.log(user)
       messageServices.setToken(user.token);
       await messageServices.getAll();
       setUser(user);
@@ -77,70 +83,80 @@ const App = () => {
     navigate("/");
   };
 
-  const match = useMatch("/message/:email");
+  const match = useMatch("/message/:name");
 
   const matchedUser = match
-    ? users.find((user) => user.email === match.params.email)
+    ? users.find((user) => user.name === match.params.name)
     : null;
 
   const createMessage = async (message) => {
-    const email = matchedUser.email;
-    await messageServices.create(email, message);
+    const name = matchedUser.name;
+    await messageServices.create(name, message);
     setMessage("Message sent successfully - now it's your turn to register ");
     setTimeout(() => {
       setMessage(null);
     }, 5000);
   };
 
-  const createMessages = async() => {
+  const createMessages = async () => {
     const loggedUser = window.localStorage.getItem("loggedInUser");
     if (loggedUser) {
       const user = JSON.parse(loggedUser);
-      console.log(user)
+      console.log(user);
       setUser(user);
+      userServices
+        .getAll()
+        .then((data) => {
+          const userData = data.find((d) => d.name === user.name);
+          console.log(userData);
+          setMessages(userData.messages);
+        })
+        .catch((err) => console.log(err));
       messageServices.setToken(user.token);
-      // const res = await userServices.getAll()
-      // setUsers(res)
     }
-  }
+  };
 
   return (
-    <Container>
-      <Routes>
-        <Route
-          path="/sign-up"
-          element={<UserForm addUser={addUser} message={message} />}
-        />
-        {users.map((user) => (
+    <Wrapper>
+      <Container className="center">
+        <Routes>
           <Route
-            key={user.id}
-            path={`/message/${user.email}`}
+            path="/sign-up"
+            element={<UserForm addUser={addUser} message={message} />}
+          />
+          {users.map((user) => (
+            <Route
+              key={user.id}
+              path={`/message/${user.name}`}
+              element={
+                <MessageUser
+                  user={matchedUser}
+                  createMessage={createMessage}
+                  messages={message}
+                />
+              }
+            />
+          ))}
+
+          <Route
+            path="/message"
             element={
-              <MessageUser
-                user={matchedUser}
-                createMessage={createMessage}
-                messages={message}
+              <MessageBox
+                user={user}
+                messages={messages}
+                handleLogout={handleLogout}
+                createMessages={createMessages}
               />
             }
           />
-        ))}
-
-        <Route
-          path="/message"
-          element={<MessageBox user={user} handleLogout={handleLogout} createMessages={createMessages} />}
-        />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/"
-          element={<LoginForm createLogin={handleLogin} message={message} />}
-        />
-      </Routes>
-      {/* {users.map((user) => (
-        <p>
-          {user.name} {user.email}
-        </p>
-      ))} */}
-    </Container>
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/"
+            element={<LoginForm createLogin={handleLogin} message={message} />}
+          />
+        </Routes>
+      </Container>
+    </Wrapper>
   );
 };
 

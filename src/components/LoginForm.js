@@ -48,12 +48,12 @@ const Button = styled.button`
 `;
 
 const LoginForm = ({ createLogin, message }) => {
-  const email = useField("text", "Enter your email");
+  const userName = useField("text", "Enter your Username");
   const password = useField("password", "Enter password");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createLogin({ email: email.value, password: password.value });
+    createLogin({ name: userName.value, password: password.value });
     // email.reset()
     // password.reset()
   };
@@ -68,8 +68,8 @@ const LoginForm = ({ createLogin, message }) => {
       <Message>{message}</Message>
       <form onSubmit={handleSubmit}>
         <div>
-          <Label>Your Email</Label>
-          <Input {...email} />
+          <Label>Your Username</Label>
+          <Input {...userName} />
         </div>
         <div>
           <Label>Your Password</Label>
@@ -78,7 +78,11 @@ const LoginForm = ({ createLogin, message }) => {
         <Button type="submit">Login</Button>
       </form>
       <P>
-        Don't Have an Account? <Link to="/sign-up">Register</Link> here
+        Don't Have an Account?{" "}
+        <Link style={{ color: "green", textDecoration: "none" }} to="/sign-up">
+          Register
+        </Link>{" "}
+        here
       </P>
     </div>
   );

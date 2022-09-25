@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import styled from "styled-components";
-// import userServices from '../services/user'
 
 const H1 = styled.h1`
   color: white;
@@ -20,6 +19,9 @@ const Button = styled.button`
 const P = styled.p`
   color: #b0b7c0;
   line-height: 1.5rem;
+`;
+const Desc = styled(P)`
+  text-align: center;
 `;
 const CenteredP = styled.p`
   color: #b0b7c0;
@@ -48,12 +50,12 @@ const Message = styled.div`
   padding: 0.4rem;
 `;
 
-const MessageBox = ({ user, handleLogout, createMessages }) => {
+const MessageBox = ({ handleLogout, createMessages, user, messages }) => {
   useEffect(() => {
-    createMessages()
-  },[])
+    createMessages();
+  }, []);
+
   const url = "http://localhost:3000/message";
-  // console.log(user);
   if (!user.messages) {
     return null;
   }
@@ -64,27 +66,32 @@ const MessageBox = ({ user, handleLogout, createMessages }) => {
         Welcome <br /> {user.name}
       </H1>
       <a
-        style={{ display: "flex", justifyContent: "center" }}
-        href={`http://localhost:3000/message/${user.email}`}
-      >{`${url}/${user.email}`}</a>
-      <P>
+        style={{
+          display: "flex",
+          fontSize: "13px",
+          justifyContent: "center",
+          color: "#5fdee2",
+        }}
+        href={`/message/${user.name}`}
+      >{`${url}/${user.name}`}</a>
+      <Desc>
         Share your profile link ❤️ to get responses from your friend. You can
         check out your responses below. 👌
-      </P>
+      </Desc>
       <H1>My Answers</H1>
       <CenteredP>
         👇 Scroll 👇 down to check out the messages that you have received
       </CenteredP>
-      {user.messages.length === 0 ? (
+      {messages.length === 0 ? (
         <Messageborder>
           <BorderedP>
-            Oops! 😅 No one has sent you a message in last 3 Days! Share your
-            profile link and check back later again!
+            Oops! 😅 No one has sent you a message!! Share your profile link and
+            check back later again!
           </BorderedP>
         </Messageborder>
       ) : (
         <div>
-          {user.messages.map((message) => (
+          {messages.map((message) => (
             <Message key={message._id}>
               <P>
                 <strong>Message:</strong> <br />
