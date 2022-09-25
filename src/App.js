@@ -1,25 +1,147 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import { Route, Routes, useMatch, useNavigate } from "react-router-dom";
+import LoginForm from "./components/LoginForm";
+import UserForm from "./components/UserForm";
+import userServices from "./services/user";
+import loginServices from "./services/login";
+import MessageBox from "./components/MessageBox";
+import MessageUser from "./components/MessageUser";
+import messageServices from "./services/message";
+import styled from "styled-components";
+import Register from "./components/Register";
 
-function App() {
+const Container = styled.div`
+  background-color: #251433;
+  max-width: 35rem;
+  margin: 2rem auto;
+  padding: 3rem;
+  border-radius: 10px;
+`;
+
+const App = () => {
+  const [users, setUsers] = useState([]);
+  const [user, setUser] = useState({});
+  const [message, setMessage] = useState("");
+  useEffect(() => {
+    async function fetchData() {
+      const data = await userServices.getAll();
+      return setUsers(data);
+    }
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const loggedUser = window.localStorage.getItem("loggedInUser");
+    if (loggedUser) {
+      const user = JSON.parse(loggedUser);
+      setUser(user);
+      messageServices.setToken(user.token);
+    }
+  }, []);
+
+  const navigate = useNavigate();
+
+  const addUser = async (userObject) => {
+    try {
+      const user = await userServices.create(userObject);
+      setUsers(users.concat(user));
+      setUser(user);
+      navigate("/message");
+    } catch (error) {
+      setMessage(error.response.data.error);
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+    }
+  };
+
+  const handleLogin = async (loginDetails) => {
+    try {
+      const user = await loginServices(loginDetails);
+      window.localStorage.setItem("loggedInUser", JSON.stringify(user));
+      // console.log(user)
+      messageServices.setToken(user.token);
+      await messageServices.getAll();
+      setUser(user);
+      navigate("/message");
+    } catch (error) {
+      setMessage(error.response.data.error);
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+    }
+  };
+
+  const handleLogout = () => {
+    window.localStorage.removeItem("loggedInUser");
+    navigate("/");
+  };
+
+  const match = useMatch("/message/:email");
+
+  const matchedUser = match
+    ? users.find((user) => user.email === match.params.email)
+    : null;
+
+  const createMessage = async (message) => {
+    const email = matchedUser.email;
+    await messageServices.create(email, message);
+    setMessage("Message sent successfully - now it's your turn to register ");
+    setTimeout(() => {
+      setMessage(null);
+    }, 5000);
+  };
+
+  const createMessages = async() => {
+    const loggedUser = window.localStorage.getItem("loggedInUser");
+    if (loggedUser) {
+      const user = JSON.parse(loggedUser);
+      console.log(user)
+      setUser(user);
+      messageServices.setToken(user.token);
+      // const res = await userServices.getAll()
+      // setUsers(res)
+    }
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+    <Container>
+      <Routes>
+        <Route
+          path="/sign-up"
+          element={<UserForm addUser={addUser} message={message} />}
+        />
+        {users.map((user) => (
+          <Route
+            key={user.id}
+            path={`/message/${user.email}`}
+            element={
+              <MessageUser
+                user={matchedUser}
+                createMessage={createMessage}
+                messages={message}
+              />
+            }
+          />
+        ))}
+
+        <Route
+          path="/message"
+          element={<MessageBox user={user} handleLogout={handleLogout} createMessages={createMessages} />}
+        />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/"
+          element={<LoginForm createLogin={handleLogin} message={message} />}
+        />
+      </Routes>
+      {/* {users.map((user) => (
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          {user.name} {user.email}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      ))} */}
+    </Container>
   );
-}
+};
 
 export default App;
