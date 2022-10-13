@@ -51,6 +51,9 @@ const App = () => {
   const addUser = async (userObject) => {
     try {
       const user = await userServices.create(userObject);
+      // window.localStorage.setItem("loggedInUser", JSON.stringify(user));
+      // messageServices.setToken(user.token);
+      // await messageServices.getAll();
       setUsers(users.concat(user));
       setUser(user);
       navigate("/message");

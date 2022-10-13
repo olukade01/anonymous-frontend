@@ -114,5 +114,4 @@ const MessageBox = ({ handleLogout, createMessages, user, messages }) => {
     </div>
   );
 };
-
 export default MessageBox;
